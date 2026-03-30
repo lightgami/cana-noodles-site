@@ -80,7 +80,7 @@ function estimateShipping(subtotal, weightLbs, zipCode = "") {
     shipping = 29.95;
   }
 
-  if (/^(9|8)/.test(zipCode.trim())) {
+  if (/^(9|8)/.test((zipCode || "").trim())) {
     shipping += 3.5;
   }
 
@@ -88,6 +88,8 @@ function estimateShipping(subtotal, weightLbs, zipCode = "") {
 }
 
 function renderProducts() {
+  if (!els.productGrid) return;
+
   els.productGrid.innerHTML = state.products.map((product) => `
     <article class="product-card">
       <div class="product-media">
@@ -112,7 +114,7 @@ function renderProducts() {
               <div class="price">${formatCurrency(product.price)}</div>
               <div class="small-note">Suggested starter price</div>
             </div>
-            <button class="btn btn-primary" data-add="${product.id}">Add to cart</button>
+            <button class="btn btn-primary" data-add="${product.id}" type="button">Add to cart</button>
           </div>
         </div>
       </div>
@@ -131,16 +133,19 @@ function renderCart() {
   const total = subtotal + shipping;
   const count = state.cart.reduce((sum, item) => sum + item.qty, 0);
 
-  els.cartCount.textContent = count;
-  els.subtotalValue.textContent = formatCurrency(subtotal);
-  els.shippingValue.textContent = formatCurrency(shipping);
-  els.totalValue.textContent = formatCurrency(total);
+  if (els.cartCount) els.cartCount.textContent = count;
+  if (els.subtotalValue) els.subtotalValue.textContent = formatCurrency(subtotal);
+  if (els.shippingValue) els.shippingValue.textContent = formatCurrency(shipping);
+  if (els.totalValue) els.totalValue.textContent = formatCurrency(total);
+
+  if (!els.cartItems) return;
 
   if (!state.cart.length) {
     els.cartItems.innerHTML = `<div class="empty-state">Your cart is empty. Add a few noodle items to get started.</div>`;
   } else {
     els.cartItems.innerHTML = state.cart.map((item) => {
       const product = getProduct(item.id);
+      if (!product) return "";
       return `
         <article class="cart-item">
           <img src="${product.image}" alt="${product.name}" />
@@ -149,9 +154,9 @@ function renderCart() {
             <p>${product.subtitle}</p>
             <p>${formatCurrency(product.price)} each</p>
             <div class="qty-controls">
-              <button data-delta="-1" data-id="${product.id}">−</button>
+              <button data-delta="-1" data-id="${product.id}" type="button">−</button>
               <strong>${item.qty}</strong>
-              <button data-delta="1" data-id="${product.id}">+</button>
+              <button data-delta="1" data-id="${product.id}" type="button">+</button>
             </div>
           </div>
           <strong>${formatCurrency(product.price * item.qty)}</strong>
@@ -168,6 +173,8 @@ function renderCart() {
 }
 
 function renderCheckoutSummary(subtotal, shipping, total, weight) {
+  if (!els.checkoutSummary) return;
+
   els.checkoutSummary.innerHTML = `
     <div class="order-line"><span>Items</span><strong>${state.cart.reduce((sum, item) => sum + item.qty, 0)}</strong></div>
     <div class="order-line"><span>Estimated weight</span><strong>${weight.toFixed(1)} lbs</strong></div>
@@ -178,69 +185,100 @@ function renderCheckoutSummary(subtotal, shipping, total, weight) {
 }
 
 function openCart() {
+  if (!els.cartDrawer) return;
   els.cartDrawer.classList.add("open");
   els.cartDrawer.setAttribute("aria-hidden", "false");
 }
 
 function closeCart() {
+  if (!els.cartDrawer) return;
   els.cartDrawer.classList.remove("open");
   els.cartDrawer.setAttribute("aria-hidden", "true");
 }
 
 function openModal(modalEl) {
+  if (!modalEl) return;
   modalEl.classList.add("open");
   modalEl.setAttribute("aria-hidden", "false");
 }
 
 function closeModal(modalEl) {
+  if (!modalEl) return;
   modalEl.classList.remove("open");
   modalEl.setAttribute("aria-hidden", "true");
 }
 
 function wireEvents() {
-  document.getElementById("openCart").addEventListener("click", openCart);
-  document.getElementById("closeCart").addEventListener("click", closeCart);
-  document.getElementById("openEstimator").addEventListener("click", () => openModal(els.shippingModal));
-  document.getElementById("closeEstimator").addEventListener("click", () => closeModal(els.shippingModal));
-  document.getElementById("goCheckout").addEventListener("click", () => {
-    if (!state.cart.length) {
-      alert("Add at least one item before checking out.");
-      return;
-    }
-    closeCart();
-    openModal(els.checkoutModal);
-  });
-  document.getElementById("closeCheckout").addEventListener("click", () => closeModal(els.checkoutModal));
+  const openCartBtn = document.getElementById("openCart");
+  const closeCartBtn = document.getElementById("closeCart");
+  const openEstimatorBtn = document.getElementById("openEstimator");
+  const closeEstimatorBtn = document.getElementById("closeEstimator");
+  const goCheckoutBtn = document.getElementById("goCheckout");
+  const closeCheckoutBtn = document.getElementById("closeCheckout");
+  const shippingForm = document.getElementById("shippingForm");
+  const checkoutForm = document.getElementById("checkoutForm");
+  const yearEl = document.getElementById("year");
 
-  els.cartDrawer.addEventListener("click", (event) => {
-    if (event.target === els.cartDrawer) closeCart();
-  });
+  if (openCartBtn) openCartBtn.addEventListener("click", openCart);
+  if (closeCartBtn) closeCartBtn.addEventListener("click", closeCart);
+  if (openEstimatorBtn) openEstimatorBtn.addEventListener("click", () => openModal(els.shippingModal));
+  if (closeEstimatorBtn) closeEstimatorBtn.addEventListener("click", () => closeModal(els.shippingModal));
+
+  if (goCheckoutBtn) {
+    goCheckoutBtn.addEventListener("click", () => {
+      if (!state.cart.length) {
+        alert("Add at least one item before checking out.");
+        return;
+      }
+      closeCart();
+      openModal(els.checkoutModal);
+    });
+  }
+
+  if (closeCheckoutBtn) {
+    closeCheckoutBtn.addEventListener("click", () => closeModal(els.checkoutModal));
+  }
+
+  if (els.cartDrawer) {
+    els.cartDrawer.addEventListener("click", (event) => {
+      if (event.target === els.cartDrawer) closeCart();
+    });
+  }
+
   [els.shippingModal, els.checkoutModal].forEach((modal) => {
+    if (!modal) return;
     modal.addEventListener("click", (event) => {
       if (event.target === modal) closeModal(modal);
     });
   });
 
-  document.getElementById("shippingForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const zipCode = document.getElementById("zipCode").value;
-    const subtotal = Number(document.getElementById("orderSubtotal").value || 0);
-    const weight = Number(document.getElementById("orderWeight").value || 0);
-    const shipping = estimateShipping(subtotal, weight, zipCode);
-    const total = subtotal + shipping;
-    els.estimateResult.innerHTML = `Estimated shipping: <strong>${formatCurrency(shipping)}</strong><br>Total after shipping: <strong>${formatCurrency(total)}</strong>`;
-  });
+  if (shippingForm) {
+    shippingForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const zipCode = document.getElementById("zipCode")?.value || "";
+      const subtotal = Number(document.getElementById("orderSubtotal")?.value || 0);
+      const weight = Number(document.getElementById("orderWeight")?.value || 0);
+      const shipping = estimateShipping(subtotal, weight, zipCode);
+      const total = subtotal + shipping;
 
-  document.getElementById("checkoutForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const zipCode = document.getElementById("checkoutZip").value;
-    const subtotal = getSubtotal();
-    const shipping = estimateShipping(subtotal, getTotalWeight(), zipCode);
-    const total = subtotal + shipping;
-    alert(`Checkout placeholder complete.\n\nSubtotal: ${formatCurrency(subtotal)}\nShipping: ${formatCurrency(shipping)}\nTotal: ${formatCurrency(total)}\n\nNext step: connect payment provider and order submission.`);
-  });
+      if (els.estimateResult) {
+        els.estimateResult.innerHTML = `Estimated shipping: <strong>${formatCurrency(shipping)}</strong><br>Total after shipping: <strong>${formatCurrency(total)}</strong>`;
+      }
+    });
+  }
 
-  document.getElementById("year").textContent = new Date().getFullYear();
+  if (checkoutForm) {
+    checkoutForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const zipCode = document.getElementById("checkoutZip")?.value || "";
+      const subtotal = getSubtotal();
+      const shipping = estimateShipping(subtotal, getTotalWeight(), zipCode);
+      const total = subtotal + shipping;
+      alert(`Checkout placeholder complete.\n\nSubtotal: ${formatCurrency(subtotal)}\nShipping: ${formatCurrency(shipping)}\nTotal: ${formatCurrency(total)}\n\nNext step: connect payment provider and order submission.`);
+    });
+  }
+
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 }
 
 renderProducts();
