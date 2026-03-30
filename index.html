@@ -14,7 +14,7 @@
 <body>
   <header class="site-header">
     <div class="container nav-wrap">
-      <a href="#home" class="brand">
+      <a href="#home" class="brand" aria-label="Cana Noodles home">
         <span class="brand-mark">C</span>
         <span class="brand-text">
           <strong>Cana</strong>
@@ -22,7 +22,7 @@
         </span>
       </a>
 
-      <nav class="main-nav">
+      <nav class="main-nav" id="mainNav">
         <a href="#shop">Shop</a>
         <a href="#story">Our Story</a>
         <a href="#how-to-cook">How to Cook</a>
@@ -31,8 +31,8 @@
       </nav>
 
       <div class="nav-actions">
-        <button class="btn btn-secondary btn-sm" id="openEstimator">Estimate Shipping</button>
-        <button class="cart-button" id="openCart">
+        <button class="btn btn-secondary btn-sm" id="openEstimator" type="button">Estimate Shipping</button>
+        <button class="cart-button" id="openCart" aria-label="Open cart" type="button">
           Cart <span id="cartCount">0</span>
         </button>
       </div>
@@ -40,7 +40,6 @@
   </header>
 
   <main>
-    <!-- HERO -->
     <section class="hero" id="home">
       <div class="container hero-grid">
         <div class="hero-copy">
@@ -52,7 +51,7 @@
           </h1>
 
           <p class="hero-text">
-            Inspired by the spirit of Cana — where transformation begins at the table.
+            Inspired by the spirit of Cana, where transformation begins at the table.
             Fresh rice vermicelli made to bring people together.
           </p>
 
@@ -69,19 +68,35 @@
         </div>
 
         <div class="hero-card">
-          <img src="assets/img/bun-tuoi-medium.jpg" alt="Cana Noodles Bun Tuoi" />
+          <img src="assets/img/bun-tuoi-medium.jpg" alt="Cana Noodles Bun Tuoi Fresh Rice Vermicelli Medium Size package" />
         </div>
       </div>
     </section>
 
-    <!-- STORY -->
+    <section class="featured-strip">
+      <div class="container feature-list">
+        <article>
+          <h2>Simple ingredients</h2>
+          <p>Rice, water, and carefully selected ingredients crafted into fresh vermicelli with a clean, familiar taste.</p>
+        </article>
+        <article>
+          <h2>Fast prep</h2>
+          <p>Ready in just minutes for bowls, stir-fries, fresh herbs, and the meals that gather people together.</p>
+        </article>
+        <article>
+          <h2>Made to share</h2>
+          <p>Cana is rooted in the idea that something humble can become something meaningful at the table.</p>
+        </article>
+      </div>
+    </section>
+
     <section class="section" id="story">
       <div class="container two-col">
         <div>
           <p class="eyebrow">Our Story</p>
           <h2>Where simplicity becomes something more</h2>
           <p>
-            Cana is known as a place of transformation — where something ordinary became extraordinary.
+            Cana is known as a place of transformation, where something ordinary became extraordinary.
           </p>
           <p>
             At Cana Noodles, we carry that same spirit. Simple ingredients like rice and water,
@@ -104,7 +119,6 @@
       </div>
     </section>
 
-    <!-- SHOP -->
     <section class="products section" id="shop">
       <div class="container">
         <div class="section-head">
@@ -121,7 +135,6 @@
       </div>
     </section>
 
-    <!-- COOKING -->
     <section class="section cooking" id="how-to-cook">
       <div class="container">
         <div class="section-head">
@@ -129,6 +142,7 @@
             <p class="eyebrow">Preparation</p>
             <h2>Simple steps</h2>
           </div>
+          <p>Based on the package instructions, with room to refine later.</p>
         </div>
 
         <div class="steps">
@@ -151,31 +165,36 @@
       </div>
     </section>
 
-    <!-- FAQ -->
     <section class="section faq" id="faq">
       <div class="container">
         <div class="section-head">
-          <h2>FAQ</h2>
+          <div>
+            <p class="eyebrow">Questions</p>
+            <h2>FAQ</h2>
+          </div>
         </div>
 
         <div class="faq-list">
           <details>
             <summary>How is shipping calculated?</summary>
-            <p>Shipping is estimated based on order size and distance. Final rates will be confirmed at checkout.</p>
+            <p>Shipping is estimated based on subtotal, package weight, and destination zone. This is still a placeholder until real shipping rules are finalized.</p>
           </details>
           <details>
-            <summary>When will payment be available?</summary>
-            <p>Secure online payment will be added soon.</p>
+            <summary>Can I pay online yet?</summary>
+            <p>Not yet. The checkout flow is in place and ready for secure payment integration later.</p>
           </details>
           <details>
             <summary>Can I order in bulk?</summary>
-            <p>Yes. Bulk options will be available as we expand the catalog.</p>
+            <p>Yes. Bulk and bundle options can be added as the catalog grows.</p>
+          </details>
+          <details>
+            <summary>How should I store the noodles?</summary>
+            <p>Keep refrigerated and do not freeze.</p>
           </details>
         </div>
       </div>
     </section>
 
-    <!-- CONTACT -->
     <section class="section contact" id="contact">
       <div class="container contact-card">
         <div>
@@ -195,7 +214,6 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="container footer-wrap">
       <div>
@@ -206,42 +224,116 @@
     </div>
   </footer>
 
-  <!-- CART -->
-  <aside class="cart-drawer" id="cartDrawer">
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
     <div class="cart-panel">
       <div class="cart-head">
         <h2>Your cart</h2>
-        <button id="closeCart">×</button>
+        <button class="icon-button" id="closeCart" aria-label="Close cart" type="button">×</button>
       </div>
-      <div id="cartItems"></div>
+
+      <div id="cartItems" class="cart-items"></div>
 
       <div class="cart-summary">
-        <div><span>Subtotal</span><strong id="subtotalValue">$0.00</strong></div>
-        <div><span>Shipping</span><strong id="shippingValue">$0.00</strong></div>
-        <div class="total"><span>Total</span><strong id="totalValue">$0.00</strong></div>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <strong id="subtotalValue">$0.00</strong>
+        </div>
+        <div class="summary-row">
+          <span>Estimated shipping</span>
+          <strong id="shippingValue">$0.00</strong>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <strong id="totalValue">$0.00</strong>
+        </div>
 
-        <button class="btn btn-primary btn-block" id="goCheckout">
+        <button class="btn btn-primary btn-block" id="goCheckout" type="button">
           Checkout
         </button>
       </div>
     </div>
   </aside>
 
-  <!-- CHECKOUT -->
-  <div class="modal" id="checkoutModal">
+  <div class="modal" id="shippingModal" aria-hidden="true">
     <div class="modal-card">
-      <h2>Checkout</h2>
+      <div class="modal-head">
+        <h2>Estimate shipping</h2>
+        <button class="icon-button" id="closeEstimator" aria-label="Close estimator" type="button">×</button>
+      </div>
 
-      <form id="checkoutForm">
-        <input type="text" placeholder="Full name" required />
-        <input type="email" placeholder="Email" required />
-        <input type="text" placeholder="Address" required />
-        <input type="text" placeholder="ZIP code" required />
+      <form id="shippingForm" class="stack-form">
+        <label>
+          ZIP code
+          <input type="text" id="zipCode" maxlength="10" placeholder="e.g. 27596" required />
+        </label>
 
-        <button class="btn btn-primary">Place order</button>
+        <label>
+          Order subtotal
+          <input type="number" id="orderSubtotal" min="0" step="0.01" placeholder="e.g. 29.99" required />
+        </label>
+
+        <label>
+          Total item weight (lbs)
+          <input type="number" id="orderWeight" min="0" step="0.1" placeholder="e.g. 4" required />
+        </label>
+
+        <button class="btn btn-primary" type="submit">Calculate</button>
       </form>
 
-      <p class="fine-print">Secure payment coming soon.</p>
+      <div class="estimate-result" id="estimateResult"></div>
+      <p class="fine-print">This is a placeholder estimator until live shipping rules are connected.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="checkoutModal" aria-hidden="true">
+    <div class="modal-card checkout-card">
+      <div class="modal-head">
+        <h2>Checkout</h2>
+        <button class="icon-button" id="closeCheckout" aria-label="Close checkout" type="button">×</button>
+      </div>
+
+      <form class="stack-form checkout-form" id="checkoutForm">
+        <div class="checkout-grid">
+          <label>
+            Full name
+            <input type="text" placeholder="Your name" required />
+          </label>
+
+          <label>
+            Email
+            <input type="email" placeholder="you@example.com" required />
+          </label>
+
+          <label>
+            Phone
+            <input type="tel" placeholder="Optional" />
+          </label>
+
+          <label>
+            ZIP code
+            <input type="text" id="checkoutZip" placeholder="ZIP code" required />
+          </label>
+
+          <label class="full">
+            Address line 1
+            <input type="text" placeholder="Street address" required />
+          </label>
+
+          <label class="full">
+            Address line 2
+            <input type="text" placeholder="Apartment, suite, etc." />
+          </label>
+        </div>
+
+        <div class="checkout-summary-box">
+          <h3>Order summary</h3>
+          <div id="checkoutSummary"></div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Place order placeholder</button>
+      </form>
+
+      <p class="fine-print">Secure payment and live order submission will be connected later.</p>
     </div>
   </div>
 
