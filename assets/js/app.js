@@ -6,6 +6,8 @@ const state = {
   cart: JSON.parse(localStorage.getItem("cana_cart") || "[]")
 };
 
+let scrollLockY = 0;
+
 const els = {
   productGrid: document.getElementById("productGrid"),
   cartCount: document.getElementById("cartCount"),
@@ -186,30 +188,50 @@ function renderCheckoutSummary(subtotal, shipping, total, weight) {
 
 function openCart() {
   if (!els.cartDrawer) return;
+  scrollLockY = window.scrollY || window.pageYOffset || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollLockY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
   els.cartDrawer.classList.add("open");
   els.cartDrawer.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
 }
 
 function closeCart() {
   if (!els.cartDrawer) return;
   els.cartDrawer.classList.remove("open");
   els.cartDrawer.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  window.scrollTo(0, scrollLockY);
 }
 
 function openModal(modalEl) {
   if (!modalEl) return;
+  scrollLockY = window.scrollY || window.pageYOffset || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollLockY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
   modalEl.classList.add("open");
   modalEl.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
 }
 
 function closeModal(modalEl) {
   if (!modalEl) return;
   modalEl.classList.remove("open");
   modalEl.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  window.scrollTo(0, scrollLockY);
 }
 
 function wireEvents() {
