@@ -373,7 +373,7 @@ button, input { font: inherit; }
   pointer-events: none;
   transition: opacity 0.2s ease;
   z-index: 1000;
-  overflow-y: auto;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
 .cart-drawer.open,
@@ -463,14 +463,15 @@ button, input { font: inherit; }
   margin-bottom: 18px;
 }
 .modal {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   padding: 20px;
 }
 .modal-card {
   width: min(760px, 100%);
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   -webkit-overflow-scrolling: touch;
   background: #fff;
   border-radius: 28px;
