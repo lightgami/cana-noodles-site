@@ -8,6 +8,46 @@ const state = {
 
 let scrollLockY = 0;
 
+let activeModalScroller = null;
+let touchStartY = 0;
+
+function enableIOSSafariModalScroll(modalEl) {
+  const scroller = modalEl?.querySelector(".modal-card");
+  if (!scroller || scroller.dataset.iosScrollBound === "true") return;
+
+  scroller.dataset.iosScrollBound = "true";
+
+  scroller.addEventListener(
+    "touchstart",
+    (event) => {
+      if (!event.touches || !event.touches.length) return;
+      touchStartY = event.touches[0].clientY;
+    },
+    { passive: true }
+  );
+
+  scroller.addEventListener(
+    "touchmove",
+    (event) => {
+      if (!event.touches || !event.touches.length) return;
+
+      const currentY = event.touches[0].clientY;
+      const deltaY = currentY - touchStartY;
+
+      const atTop = scroller.scrollTop <= 0;
+      const atBottom =
+        scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+
+      if ((atTop && deltaY > 0) || (atBottom && deltaY < 0)) {
+        event.preventDefault();
+      }
+
+      event.stopPropagation();
+    },
+    { passive: false }
+  );
+}
+
 const els = {
   productGrid: document.getElementById("productGrid"),
   cartCount: document.getElementById("cartCount"),
@@ -220,6 +260,8 @@ function openModal(modalEl) {
   document.body.style.width = "100%";
   modalEl.classList.add("open");
   modalEl.setAttribute("aria-hidden", "false");
+  enableIOSSafariModalScroll(modalEl);
+  activeModalScroller = modalEl.querySelector(".modal-card") || null;
 }
 
 function closeModal(modalEl) {
@@ -231,6 +273,7 @@ function closeModal(modalEl) {
   document.body.style.left = "";
   document.body.style.right = "";
   document.body.style.width = "";
+  activeModalScroller = null;
   window.scrollTo(0, scrollLockY);
 }
 
