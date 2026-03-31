@@ -188,24 +188,28 @@ function openCart() {
   if (!els.cartDrawer) return;
   els.cartDrawer.classList.add("open");
   els.cartDrawer.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
 }
 
 function closeCart() {
   if (!els.cartDrawer) return;
   els.cartDrawer.classList.remove("open");
   els.cartDrawer.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
 }
 
 function openModal(modalEl) {
   if (!modalEl) return;
   modalEl.classList.add("open");
   modalEl.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
 }
 
 function closeModal(modalEl) {
   if (!modalEl) return;
   modalEl.classList.remove("open");
   modalEl.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
 }
 
 function wireEvents() {
