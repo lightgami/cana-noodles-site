@@ -286,8 +286,7 @@ button, input { font: inherit; }
 }
 .story-card,
 .contact-card,
-.modal-card,
-.checkout-summary-box {
+.modal-card {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 24px;
@@ -509,9 +508,13 @@ button, input { font: inherit; }
 }
 .checkout-grid .full { grid-column: 1 / -1; }
 .checkout-summary-box {
-  padding: 20px;
+  padding: 20px 0 0;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
 }
-.checkout-summary-box h3 { margin-top: 0; }
+.checkout-summary-box h3 {
+  margin: 0 0 14px;
+}
 .order-line {
   display: flex;
   justify-content: space-between;
@@ -556,7 +559,7 @@ button, input { font: inherit; }
 
   .modal-card {
     width: 100%;
-    max-height: calc(100vh - 32px);
+    max-height: none;
     margin: 0;
     padding: 24px 20px;
     border-radius: 24px;
