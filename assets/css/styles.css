@@ -364,17 +364,21 @@ button, input { font: inherit; }
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(10, 10, 10, 0.54);
+  background: rgba(18, 18, 18, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-  z-index: 40;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .cart-drawer.open,
 .modal.open {
   opacity: 1;
-  visibility: visible;
   pointer-events: auto;
 }
 .cart-panel {
@@ -464,8 +468,14 @@ button, input { font: inherit; }
   padding: 20px;
 }
 .modal-card {
-  width: min(640px, 100%);
-  padding: 26px;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  border-radius: 28px;
+  padding: 32px;
+  box-sizing: border-box;
 }
 .checkout-card { width: min(840px, 100%); }
 .stack-form {
@@ -535,4 +545,19 @@ button, input { font: inherit; }
   .hero h1 { font-size: 2.5rem; }
   .modal-card,
   .cart-panel { padding: 18px; }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: calc(100vh - 32px);
+    margin: 0;
+    padding: 24px 20px;
+    border-radius: 24px;
+  }
 }
