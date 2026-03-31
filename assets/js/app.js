@@ -6,48 +6,6 @@ const state = {
   cart: JSON.parse(localStorage.getItem("cana_cart") || "[]")
 };
 
-let scrollLockY = 0;
-
-let activeModalScroller = null;
-let touchStartY = 0;
-
-function enableIOSSafariModalScroll(modalEl) {
-  const scroller = modalEl?.querySelector(".modal-card");
-  if (!scroller || scroller.dataset.iosScrollBound === "true") return;
-
-  scroller.dataset.iosScrollBound = "true";
-
-  scroller.addEventListener(
-    "touchstart",
-    (event) => {
-      if (!event.touches || !event.touches.length) return;
-      touchStartY = event.touches[0].clientY;
-    },
-    { passive: true }
-  );
-
-  scroller.addEventListener(
-    "touchmove",
-    (event) => {
-      if (!event.touches || !event.touches.length) return;
-
-      const currentY = event.touches[0].clientY;
-      const deltaY = currentY - touchStartY;
-
-      const atTop = scroller.scrollTop <= 0;
-      const atBottom =
-        scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
-
-      if ((atTop && deltaY > 0) || (atBottom && deltaY < 0)) {
-        event.preventDefault();
-      }
-
-      event.stopPropagation();
-    },
-    { passive: false }
-  );
-}
-
 const els = {
   productGrid: document.getElementById("productGrid"),
   cartCount: document.getElementById("cartCount"),
@@ -57,9 +15,7 @@ const els = {
   shippingValue: document.getElementById("shippingValue"),
   totalValue: document.getElementById("totalValue"),
   shippingModal: document.getElementById("shippingModal"),
-  estimateResult: document.getElementById("estimateResult"),
-  checkoutModal: document.getElementById("checkoutModal"),
-  checkoutSummary: document.getElementById("checkoutSummary")
+  estimateResult: document.getElementById("estimateResult")
 };
 
 function saveCart() {
@@ -85,10 +41,13 @@ function addToCart(productId) {
 function changeQty(productId, delta) {
   const item = state.cart.find((entry) => entry.id === productId);
   if (!item) return;
+
   item.qty += delta;
+
   if (item.qty <= 0) {
     state.cart = state.cart.filter((entry) => entry.id !== productId);
   }
+
   saveCart();
   renderCart();
 }
@@ -188,6 +147,7 @@ function renderCart() {
     els.cartItems.innerHTML = state.cart.map((item) => {
       const product = getProduct(item.id);
       if (!product) return "";
+
       return `
         <article class="cart-item">
           <img src="${product.image}" alt="${product.name}" />
@@ -210,71 +170,32 @@ function renderCart() {
       button.addEventListener("click", () => changeQty(button.dataset.id, Number(button.dataset.delta)));
     });
   }
-
-  renderCheckoutSummary(subtotal, shipping, total, weight);
-}
-
-function renderCheckoutSummary(subtotal, shipping, total, weight) {
-  if (!els.checkoutSummary) return;
-
-  els.checkoutSummary.innerHTML = `
-    <div class="order-line"><span>Items</span><strong>${state.cart.reduce((sum, item) => sum + item.qty, 0)}</strong></div>
-    <div class="order-line"><span>Estimated weight</span><strong>${weight.toFixed(1)} lbs</strong></div>
-    <div class="order-line"><span>Subtotal</span><strong>${formatCurrency(subtotal)}</strong></div>
-    <div class="order-line"><span>Estimated shipping</span><strong>${formatCurrency(shipping)}</strong></div>
-    <div class="order-line"><span>Total</span><strong>${formatCurrency(total)}</strong></div>
-  `;
 }
 
 function openCart() {
   if (!els.cartDrawer) return;
-  scrollLockY = window.scrollY || window.pageYOffset || 0;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollLockY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
   els.cartDrawer.classList.add("open");
   els.cartDrawer.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
 }
 
 function closeCart() {
   if (!els.cartDrawer) return;
   els.cartDrawer.classList.remove("open");
   els.cartDrawer.setAttribute("aria-hidden", "true");
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-  window.scrollTo(0, scrollLockY);
+  document.body.style.overflow = "";
 }
 
 function openModal(modalEl) {
   if (!modalEl) return;
-  scrollLockY = window.scrollY || window.pageYOffset || 0;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollLockY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
   modalEl.classList.add("open");
   modalEl.setAttribute("aria-hidden", "false");
-  enableIOSSafariModalScroll(modalEl);
-  activeModalScroller = modalEl.querySelector(".modal-card") || null;
 }
 
 function closeModal(modalEl) {
   if (!modalEl) return;
   modalEl.classList.remove("open");
   modalEl.setAttribute("aria-hidden", "true");
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-  activeModalScroller = null;
-  window.scrollTo(0, scrollLockY);
 }
 
 function wireEvents() {
@@ -283,9 +204,7 @@ function wireEvents() {
   const openEstimatorBtn = document.getElementById("openEstimator");
   const closeEstimatorBtn = document.getElementById("closeEstimator");
   const goCheckoutBtn = document.getElementById("goCheckout");
-  const closeCheckoutBtn = document.getElementById("closeCheckout");
   const shippingForm = document.getElementById("shippingForm");
-  const checkoutForm = document.getElementById("checkoutForm");
   const yearEl = document.getElementById("year");
 
   if (openCartBtn) openCartBtn.addEventListener("click", openCart);
@@ -299,13 +218,8 @@ function wireEvents() {
         alert("Add at least one item before checking out.");
         return;
       }
-      closeCart();
-      openModal(els.checkoutModal);
+      window.location.href = "checkout.html";
     });
-  }
-
-  if (closeCheckoutBtn) {
-    closeCheckoutBtn.addEventListener("click", () => closeModal(els.checkoutModal));
   }
 
   if (els.cartDrawer) {
@@ -314,12 +228,11 @@ function wireEvents() {
     });
   }
 
-  [els.shippingModal, els.checkoutModal].forEach((modal) => {
-    if (!modal) return;
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal) closeModal(modal);
+  if (els.shippingModal) {
+    els.shippingModal.addEventListener("click", (event) => {
+      if (event.target === els.shippingModal) closeModal(els.shippingModal);
     });
-  });
+  }
 
   if (shippingForm) {
     shippingForm.addEventListener("submit", (event) => {
@@ -333,17 +246,6 @@ function wireEvents() {
       if (els.estimateResult) {
         els.estimateResult.innerHTML = `Estimated shipping: <strong>${formatCurrency(shipping)}</strong><br>Total after shipping: <strong>${formatCurrency(total)}</strong>`;
       }
-    });
-  }
-
-  if (checkoutForm) {
-    checkoutForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const zipCode = document.getElementById("checkoutZip")?.value || "";
-      const subtotal = getSubtotal();
-      const shipping = estimateShipping(subtotal, getTotalWeight(), zipCode);
-      const total = subtotal + shipping;
-      alert(`Checkout placeholder complete.\n\nSubtotal: ${formatCurrency(subtotal)}\nShipping: ${formatCurrency(shipping)}\nTotal: ${formatCurrency(total)}\n\nNext step: connect payment provider and order submission.`);
     });
   }
 
